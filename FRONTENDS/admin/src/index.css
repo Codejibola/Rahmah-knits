@@ -2,4 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom styles can be added below */
+/* theme accents */
+:root{
+  --bg: #000000;
+  --panel: #111111;
+  --gold: #cfa64a;
+}
+
+/* small helpers */
+body{
+  background: var(--bg);
+  color: #f6e7c2;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
