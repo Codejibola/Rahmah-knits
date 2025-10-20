@@ -6,6 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import pool from "./config/db.js";
 import ProductRoutes from "./routes/ProductRoutes.js";
+import messageRoutes from "./routes/MessagesRoutes.js";
 
 dotenv.config();
 
@@ -66,6 +67,7 @@ class App {
 
   routes() {
     this.app.use("/api/products", ProductRoutes);
+    this.app.use("/api/messages", messageRoutes);
 
     // File upload endpoint
     this.app.post("/api/upload", upload.single("image"), (req, res) => {

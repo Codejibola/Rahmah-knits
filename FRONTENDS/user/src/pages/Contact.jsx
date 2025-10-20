@@ -13,18 +13,17 @@ const Contact = () => {
   const EMAILJS_SERVICE = import.meta.env.VITE_EMAILJS_SERVICE || "service_40tfur9";
   const EMAILJS_TEMPLATE = import.meta.env.VITE_EMAILJS_TEMPLATE || "template_rhqsp1q";
   const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "amQahp5w5ZcLj-FI0";
-  const EMAILJS_RECIPIENT = import.meta.env.VITE_EMAILJS_RECIPIENT || "owner@example.com"; 
+  const EMAILJS_RECIPIENT = import.meta.env.VITE_EMAILJS_RECIPIENT || "owner@example.com";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Basic client-side validation before sending
     if (!form.name || !form.email || !form.message) {
       setLoading(false);
       setStatus("error");
@@ -33,7 +32,6 @@ const Contact = () => {
       return;
     }
 
-    // Basic email format check
     const emailRegex = /^\S+@\S+\.\S+$/;
     if (!emailRegex.test(form.email)) {
       setLoading(false);
@@ -43,56 +41,53 @@ const Contact = () => {
       return;
     }
 
-    emailjs
-      .send(
+    try {
+      // 1️⃣ Save message to your backend database
+      const dbRes = await fetch("http://localhost:5000/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (!dbRes.ok) {
+        throw new Error("Failed to save message to database");
+      }
+
+      // 2️⃣ Send auto-reply with EmailJS
+      await emailjs.send(
         EMAILJS_SERVICE,
         EMAILJS_TEMPLATE,
         {
           from_name: form.name,
-          email: form.email || EMAILJS_RECIPIENT, 
+          email: form.email || EMAILJS_RECIPIENT,
           message: form.message,
-          // Template expects {{email}} for recipient 
-          
         },
         EMAILJS_PUBLIC_KEY
-      )
-      .then((response) => {
-        // Log full response for debugging (status, text)
-        console.log("EmailJS response:", response);
-        setLoading(false);
-        setStatus("success");
-        setErrorMessage("");
-        // Persist the message locally so the admin panel can show it
-        try {
-          const stored = JSON.parse(localStorage.getItem("rahmah_messages") || "[]");
-          stored.push({
-            from_name: form.name,
-            from_email: form.email,
-            message: form.message,
-            createdAt: new Date().toISOString(),
-          });
-          localStorage.setItem("rahmah_messages", JSON.stringify(stored));
-        } catch (err) {
-          console.warn("Failed to persist message to localStorage:", err);
-        }
+      );
 
-        setForm({ name: "", email: "", message: "" });
-        setTimeout(() => setStatus(""), 4000);
-      })
-      .catch((error) => {
-        // EmailJS can return useful info in the error object / response body
-        console.error("EmailJS error:", error);
-        let msg = "Failed to send. Please try again.";
-        // Try to pick a human-friendly message from common fields
-        if (error && error.text) msg = error.text;
-        else if (error && error.statusText) msg = error.statusText;
-        else if (error && error.message) msg = error.message;
+      // 3️⃣ Update UI state & local cache
+      setLoading(false);
+      setStatus("success");
+      setErrorMessage("");
 
-        setLoading(false);
-        setStatus("error");
-        setErrorMessage(msg);
-        setTimeout(() => setStatus(""), 4000);
+      const stored = JSON.parse(localStorage.getItem("rahmah_messages") || "[]");
+      stored.push({
+        from_name: form.name,
+        from_email: form.email,
+        message: form.message,
+        createdAt: new Date().toISOString(),
       });
+      localStorage.setItem("rahmah_messages", JSON.stringify(stored));
+
+      setForm({ name: "", email: "", message: "" });
+      setTimeout(() => setStatus(""), 4000);
+    } catch (error) {
+      console.error("Error submitting message:", error);
+      setLoading(false);
+      setStatus("error");
+      setErrorMessage(error.message || "Failed to send message. Try again.");
+      setTimeout(() => setStatus(""), 4000);
+    }
   };
 
   return (

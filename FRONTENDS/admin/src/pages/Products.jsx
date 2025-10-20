@@ -113,7 +113,7 @@ export default function Products() {
       <div className="flex-1">
         <Header title="Products" subtitle="Manage your product catalog" />
         <main className="p-6 md:p-10">
-          {/* ⚡️ Make Add/Edit form show on top for mobile */}
+          {/*  Make Add/Edit form show on top for mobile */}
           <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-6">
             {/* Products List */}
             <div className="md:col-span-2">

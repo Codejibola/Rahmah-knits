@@ -15,7 +15,7 @@ export default function ProductCard({ p, onEdit, onDelete }) {
         <div className="flex items-start justify-between">
           <div>
             <h3 className="font-semibold text-yellow-200">{p.name}</h3>
-            <p className="text-sm text-yellow-100/70">{p.price}</p>
+            <p className="text-sm text-yellow-100/70">₦{p.price}</p>
             <p className="text-sm text-yellow-100/60 mt-2 line-clamp-3">{p.description}</p>
           </div>
         </div>

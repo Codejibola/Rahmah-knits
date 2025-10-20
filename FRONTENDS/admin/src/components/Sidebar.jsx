@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+//eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false); // ✅ Mobile menu state
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
     sessionStorage.removeItem("rahmah_admin_auth");
@@ -13,14 +14,14 @@ export default function Sidebar() {
   };
 
   const links = [
-    { to: "/admin", label: "Dashboard" },
+    { to: "/admin", label: "Dashboard", end: true },
     { to: "/admin/products", label: "Products" },
     { to: "/admin/messages", label: "Messages" },
   ];
 
   return (
     <>
-      {/* 🔹 Desktop Sidebar */}
+      {/* Desktop Sidebar */}
       <aside className="hidden md:block w-64 bg-black border-r border-yellow-400/10 min-h-screen text-yellow-200">
         <div className="p-6">
           <div className="text-2xl font-semibold mb-6">
@@ -32,6 +33,7 @@ export default function Sidebar() {
               <NavLink
                 key={l.to}
                 to={l.to}
+                end={l.end} // ✅ ensures Dashboard is only active on exact /admin
                 className={({ isActive }) =>
                   `block px-4 py-2 rounded-md hover:bg-yellow-400/5 transition ${
                     isActive ? "bg-yellow-400/5 border-l-4 border-yellow-400" : ""
@@ -100,7 +102,8 @@ export default function Sidebar() {
                   <NavLink
                     key={l.to}
                     to={l.to}
-                    onClick={() => setIsOpen(false)} // close after navigation
+                    end={l.end} // ✅ same fix for mobile
+                    onClick={() => setIsOpen(false)}
                     className={({ isActive }) =>
                       `block px-4 py-2 rounded-md hover:bg-yellow-400/5 transition ${
                         isActive ? "bg-yellow-400/5 border-l-4 border-yellow-400" : ""

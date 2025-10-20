@@ -14,17 +14,22 @@ export default function Dashboard() {
         const res = await fetch("http://localhost:5000/api/products");
         if (!res.ok) throw new Error("Failed to fetch products");
         const data = await res.json();
-
-        setProducts(data); // ← real DB data
+        setProducts(data);
       } catch (err) {
         console.error("❌ Error fetching products:", err);
+      }
+
+      try {
+        // ✅ Fetch messages from backend API instead of localStorage
+        const resMsg = await fetch("http://localhost:5000/api/messages");
+        if (!resMsg.ok) throw new Error("Failed to fetch messages");
+        const dataMsg = await resMsg.json();
+        setMessages(dataMsg.reverse()); // show newest first
+      } catch (err) {
+        console.error("❌ Error fetching messages:", err);
       } finally {
         setLoading(false);
       }
-
-      // Keep your local messages (or later connect to API)
-      const m = JSON.parse(localStorage.getItem("rahmah_messages") || "[]");
-      setMessages(m);
     }
 
     fetchData();
@@ -36,7 +41,8 @@ export default function Dashboard() {
       <div className="flex-1">
         <Header title="Dashboard" subtitle="Overview & quick stats" />
         <main className="p-6 md:p-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Stats Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Products Count */}
             <div className="p-6 rounded-2xl bg-zinc-900 border border-yellow-400/10">
               <h3 className="text-sm text-yellow-100/60">Products</h3>
@@ -48,14 +54,9 @@ export default function Dashboard() {
             {/* Messages Count */}
             <div className="p-6 rounded-2xl bg-zinc-900 border border-yellow-400/10">
               <h3 className="text-sm text-yellow-100/60">Messages</h3>
-              <p className="mt-4 text-3xl font-semibold">{messages.length}</p>
-            </div>
-
-            {/* Revenue */}
-            <div className="p-6 rounded-2xl bg-zinc-900 border border-yellow-400/10">
-              <h3 className="text-sm text-yellow-100/60">Revenue</h3>
-              <p className="mt-4 text-3xl font-semibold">₦—</p>
-              <p className="text-xs text-yellow-100/60 mt-2">(Add orders integration later)</p>
+              <p className="mt-4 text-3xl font-semibold">
+                {loading ? "..." : messages.length}
+              </p>
             </div>
           </div>
 
@@ -63,28 +64,29 @@ export default function Dashboard() {
           <div className="mt-8">
             <h3 className="text-lg font-semibold mb-4">Recent Messages</h3>
             <div className="space-y-3">
-              {messages.length === 0 && (
+              {loading ? (
+                <div className="text-yellow-100/60">Loading...</div>
+              ) : messages.length === 0 ? (
                 <div className="text-yellow-100/60">No messages yet</div>
-              )}
-              {messages.slice(0, 5).map((m, i) => (
-                <div
-                  key={i}
-                  className="p-4 rounded-lg bg-zinc-900 border border-yellow-400/10"
-                >
-                  <div className="flex justify-between">
-                    <div>
-                      <div className="font-medium">{m.from_name || m.name}</div>
+              ) : (
+                messages.slice(0, 5).map((m, i) => (
+                  <div
+                    key={m.id || i}
+                    className="p-4 rounded-lg bg-zinc-900 border border-yellow-400/10"
+                  >
+                    <div className="flex justify-between">
+                      <div>
+                        <div className="font-medium">{m.name}</div>
+                        <div className="text-sm text-yellow-100/60">{m.email}</div>
+                      </div>
                       <div className="text-sm text-yellow-100/60">
-                        {m.from_email || m.email}
+                        {new Date(m.created_at).toLocaleString()}
                       </div>
                     </div>
-                    <div className="text-sm text-yellow-100/60">
-                      {new Date(m.createdAt || Date.now()).toLocaleString()}
-                    </div>
+                    <p className="mt-2 text-yellow-100/70 text-sm">{m.message}</p>
                   </div>
-                  <p className="mt-2 text-yellow-100/70 text-sm">{m.message}</p>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </main>
