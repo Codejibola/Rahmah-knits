@@ -43,7 +43,7 @@ const Contact = () => {
 
     try {
       // 1️⃣ Save message to your backend database
-      const dbRes = await fetch("http://localhost:5000/api/messages", {
+      const dbRes = await fetch("https://rahmah-knits.onrender.com/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

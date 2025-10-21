@@ -10,7 +10,7 @@ export default function Messages() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/messages");
+        const res = await fetch("https://rahmah-knits.onrender.com/api/messages");
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const data = await res.json();
 
@@ -55,7 +55,7 @@ export default function Messages() {
   const handleDelete = async (id) => {
     if (!confirm("Delete this message?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/messages/${id}`, {
+      const res = await fetch(`https://rahmah-knits.onrender.com/api/messages/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete message");

@@ -6,7 +6,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [pw, setPw] = useState("");
   const [err, setErr] = useState("");
-  const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || "rahmahAdmin2025";
+  const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD;
 
 
   const handleSubmit = (e) => {

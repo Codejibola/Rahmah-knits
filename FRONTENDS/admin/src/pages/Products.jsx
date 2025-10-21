@@ -14,7 +14,7 @@ export default function Products() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch("https://rahmah-knits.onrender.com/api/products");
         const data = await res.json();
         setProducts(data);
       } catch (error) {
@@ -37,7 +37,7 @@ export default function Products() {
     if (file) formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/products", {
+      const res = await fetch("https://rahmah-knits.onrender.com/api/products", {
         method: "POST",
         body: formData,
       });
@@ -73,7 +73,7 @@ export default function Products() {
       formData.append("description", form.description);
       if (file) formData.append("image", file);
 
-      const res = await fetch(`http://localhost:5000/api/products/${editing}`, {
+      const res = await fetch(`https://rahmah-knits.onrender.com/api/products/${editing}`, {
         method: "PUT",
         body: formData,
       });
@@ -96,7 +96,7 @@ export default function Products() {
     if (!confirm("Delete this product?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/products/${id}`, { method: "DELETE" });
+      const res = await fetch(`https://rahmah-knits.onrender.com/api/products/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Delete failed");
 
       const next = products.filter((p) => p.id !== id);
