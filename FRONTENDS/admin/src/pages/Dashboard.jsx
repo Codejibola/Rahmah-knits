@@ -11,7 +11,7 @@ export default function Dashboard() {
     async function fetchData() {
       try {
         // Fetch products from backend API
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch("https://rahmah-knits.onrender.com/api/products");
         if (!res.ok) throw new Error("Failed to fetch products");
         const data = await res.json();
         setProducts(data);
@@ -21,7 +21,7 @@ export default function Dashboard() {
 
       try {
         // ✅ Fetch messages from backend API instead of localStorage
-        const resMsg = await fetch("http://localhost:5000/api/messages");
+        const resMsg = await fetch("https://rahmah-knits.onrender.com/api/messages");
         if (!resMsg.ok) throw new Error("Failed to fetch messages");
         const dataMsg = await resMsg.json();
         setMessages(dataMsg.reverse()); // show newest first
