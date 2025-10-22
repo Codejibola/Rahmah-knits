@@ -37,7 +37,7 @@ class ProductController {
 
     let { name, price, description } = req.body;
     price = parseFloat(String(price).replace(/[₦, ]/g, ""));
-
+  // Check this problem, it has an high probability that this is where the it is 
     const image_url = req.file
       ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
       : null;
