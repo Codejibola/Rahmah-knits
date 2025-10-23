@@ -1,25 +1,93 @@
-import ProductModel from "../models/ProductModel.js";
+//  Import dependencies and configurations
+import ProductModel from "../models/ProductModel.js";   // Database model for product operations (CRUD)
+import cloudinary from "../config/cloudinary.js";       // Cloudinary configuration file for image uploads
+import streamifier from "streamifier";                  // Converts file buffers into readable streams (for Cloudinary upload)
 
+//  Controller class to handle all product-related operations
 class ProductController {
-  // 🟢 Get all products
+
+  //  GET all products
   static async getAll(req, res) {
     try {
-      const products = await ProductModel.getAll();
+      const products = await ProductModel.getAll(); // Fetch all products from DB
       res.status(200).json(products);
-    } catch (error) {
-      res.status(500).json({
-        message: "Failed to fetch products",
-        error: error.message,
+    } catch (err) {
+      res.status(500).json({ 
+        message: "Failed to fetch products", 
+        error: err.message 
       });
     }
   }
 
-  // 🟢 Get single product by ID
+  //  CREATE a new product
+  static async create(req, res) {
+    try {
+      const { name, price, description } = req.body;
+
+      // Validate required fields
+      if (!name || !price) {
+        return res.status(400).json({ message: "Name and price are required" });
+      }
+
+      let imageUrl = null; // Initialize image URL (in case there's no image)
+
+      //  If user uploaded an image, upload it to Cloudinary
+      if (req.file) {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: "rahmahknits" }, // Store image inside 'rahmahknits' folder on Cloudinary
+          async (error, result) => {
+            if (error) {
+              console.error("❌ Cloudinary upload error:", error);
+              return res.status(500).json({ message: "Image upload failed", error });
+            }
+
+            //  On success, get the Cloudinary image URL
+            imageUrl = result.secure_url;
+
+            // Convert price to number and validate
+            const priceValue = parseFloat(price);
+            if (isNaN(priceValue)) {
+              return res.status(400).json({ message: "Invalid price format" });
+            }
+
+            // 💾 Save product to the database
+            const newProduct = await ProductModel.create({
+              name,
+              price: priceValue,
+              description,
+              image: imageUrl,
+            });
+
+            return res.status(201).json(newProduct);
+          }
+        );
+
+        // Convert file buffer to a stream and pipe it to Cloudinary
+        streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+
+      } else {
+        //  No image uploaded — save product without image
+        const newProduct = await ProductModel.create({
+          name,
+          price: parseFloat(price),
+          description,
+          image: null,
+        });
+        res.status(201).json(newProduct);
+      }
+    } catch (error) {
+      console.error("❌ Error creating product:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+
+  //  GET a single product by ID
   static async getById(req, res) {
     try {
-      const product = await ProductModel.getById(req.params.id);
+      const product = await ProductModel.getById(req.params.id); // Find product by ID
       if (!product)
         return res.status(404).json({ message: "Product not found" });
+      
       res.status(200).json(product);
     } catch (error) {
       res.status(500).json({
@@ -29,56 +97,27 @@ class ProductController {
     }
   }
 
- // 🟢 Create product
-  static async create(req, res) {
-    try {
-      const { name, price, description } = req.body;
-      const file = req.file;
-
-      if (!file) {
-        return res.status(400).json({ message: "Image is required" });
-      }
-
-      // Convert the file buffer to Base64 and upload directly to Cloudinary
-      const b64 = Buffer.from(file.buffer).toString("base64");
-      const dataURI = `data:${file.mimetype};base64,${b64}`;
-
-      const uploadResult = await cloudinary.uploader.upload(dataURI, {
-        folder: "rahmahknits",
-      });
-
-      const image = uploadResult.secure_url;
-
-      const newProduct = await ProductModel.create({
-        name,
-        price,
-        description,
-        image,
-      });
-
-      res.status(201).json(newProduct);
-    } catch (error) {
-      console.error("❌ Error creating product:", error);
-      res.status(500).json({ message: "Failed to create product" });
-    }
-  }
-
-  // 🟡 Update product
+  // UPDATE a product (including re-uploading image)
   static async update(req, res) {
     try {
       const { id } = req.params;
       const { name, price, description } = req.body;
-      let image = req.body.image;
+      let image = req.body.image; // Default to existing image (if no new file)
 
+      //  If a new image was uploaded, replace the old one on Cloudinary
       if (req.file) {
         const b64 = Buffer.from(req.file.buffer).toString("base64");
         const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+
+        // Upload to Cloudinary
         const uploadResult = await cloudinary.uploader.upload(dataURI, {
           folder: "rahmahknits",
         });
-        image = uploadResult.secure_url;
+
+        image = uploadResult.secure_url; // Update image URL
       }
 
+      // Update product in database
       const updatedProduct = await ProductModel.update(id, {
         name,
         price,
@@ -93,7 +132,7 @@ class ProductController {
     }
   }
 
-  // 🟢 Delete product
+  //  DELETE a product by ID
   static async delete(req, res) {
     try {
       const { id } = req.params;
@@ -108,4 +147,5 @@ class ProductController {
   }
 }
 
+//  Export the controller to be used in routes
 export default ProductController;

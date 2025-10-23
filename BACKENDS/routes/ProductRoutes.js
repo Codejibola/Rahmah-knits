@@ -1,8 +1,12 @@
 import express from "express";
+import multer from "multer";
 import ProductController from "../controllers/ProductController.js";
-import upload from "../config/multer.js";
 
 const router = express.Router();
+
+// Memory storage for Cloudinary uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 router.get("/", ProductController.getAll);
 router.get("/:id", ProductController.getById);
