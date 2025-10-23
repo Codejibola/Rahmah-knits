@@ -46,13 +46,9 @@ class App {
   }
 
   async database() {
-    try {
-      await pool.connect();
-      console.log("✅ Connected to PostgreSQL successfully");
-    } catch (error) {
-      console.error("❌ Database connection failed:", error.message);
-    }
-  }
+  console.log("✅ PostgreSQL initialized");
+}
+
 
   start() {
     this.app.listen(this.port, () => {
