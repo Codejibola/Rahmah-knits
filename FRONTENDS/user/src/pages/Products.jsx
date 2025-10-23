@@ -67,7 +67,7 @@ export default function Products() {
               className="relative group overflow-hidden rounded-2xl border border-yellow-400/20 hover:border-yellow-400 transition-all duration-500 shadow-lg hover:shadow-yellow-400/10"
             >
               <img
-                src={product.image} // ✅ use DB image
+                src={product.image_url || product.image} 
                 alt={product.name}
                 className="w-full h-72 object-cover rounded-2xl transition-transform duration-700 group-hover:scale-110"
               />

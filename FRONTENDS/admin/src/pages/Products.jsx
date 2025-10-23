@@ -60,7 +60,7 @@ export default function Products() {
     setForm({
       name: p.name,
       price: p.price,
-      image: p.image,
+      image: p.image_url, 
       description: p.description,
     });
   };

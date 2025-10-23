@@ -18,7 +18,7 @@ export default function Footer() {
 
         <div className="flex justify-center space-x-6 text-yellow-400 mb-6">
           <a
-            href="https://wa.me/2348063564014"
+            href="https://wa.me/2348134493365"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-yellow-300 transition-colors duration-300"

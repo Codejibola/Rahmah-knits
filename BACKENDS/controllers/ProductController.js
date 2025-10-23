@@ -29,65 +29,67 @@ class ProductController {
     }
   }
 
-  // 🟢 Create product
+ // 🟢 Create product
   static async create(req, res) {
-  try {
-    console.log("📩 Incoming form data:", req.body);
-    console.log("📸 Uploaded file:", req.file);
+    try {
+      const { name, price, description } = req.body;
+      const file = req.file;
 
-    let { name, price, description } = req.body;
-    price = parseFloat(String(price).replace(/[₦, ]/g, ""));
-  // Check this problem, it has an high probability that this is where the it is 
-    const image_url = req.file
-      ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
-      : null;
+      if (!file) {
+        return res.status(400).json({ message: "Image is required" });
+      }
 
-    if (!name || !price)
-      return res.status(400).json({ message: "Name and price are required" });
+      // Convert the file buffer to Base64 and upload directly to Cloudinary
+      const b64 = Buffer.from(file.buffer).toString("base64");
+      const dataURI = `data:${file.mimetype};base64,${b64}`;
 
-    const newProduct = await ProductModel.create({
-      name,
-      price,
-      description,
-      image_url,
-    });
+      const uploadResult = await cloudinary.uploader.upload(dataURI, {
+        folder: "rahmahknits",
+      });
 
-    res.status(201).json(newProduct);
-  } catch (error) {
-    console.error("❌ Error creating product:", error);
-    res.status(500).json({
-      message: "Failed to create product",
-      error: error.message,
-    });
+      const image = uploadResult.secure_url;
+
+      const newProduct = await ProductModel.create({
+        name,
+        price,
+        description,
+        image,
+      });
+
+      res.status(201).json(newProduct);
+    } catch (error) {
+      console.error("❌ Error creating product:", error);
+      res.status(500).json({ message: "Failed to create product" });
+    }
   }
-}
 
-
-  // 🟢 Update product
+  // 🟡 Update product
   static async update(req, res) {
     try {
       const { id } = req.params;
       const { name, price, description } = req.body;
-      const image_url = req.file
-        ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
-        : req.body.image_url;
+      let image = req.body.image;
+
+      if (req.file) {
+        const b64 = Buffer.from(req.file.buffer).toString("base64");
+        const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+        const uploadResult = await cloudinary.uploader.upload(dataURI, {
+          folder: "rahmahknits",
+        });
+        image = uploadResult.secure_url;
+      }
 
       const updatedProduct = await ProductModel.update(id, {
         name,
         price,
         description,
-        image_url,
+        image,
       });
-
-      if (!updatedProduct)
-        return res.status(404).json({ message: "Product not found" });
 
       res.status(200).json(updatedProduct);
     } catch (error) {
-      res.status(500).json({
-        message: "Failed to update product",
-        error: error.message,
-      });
+      console.error("❌ Error updating product:", error);
+      res.status(500).json({ message: "Failed to update product" });
     }
   }
 
