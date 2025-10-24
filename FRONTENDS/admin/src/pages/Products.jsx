@@ -8,13 +8,20 @@ import { motion } from "framer-motion";
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ name: "", price: "", image: null, description: "" });
+  const [form, setForm] = useState({
+    name: "",
+    price: "",
+    image: null,
+    description: "",
+  });
   const [file, setFile] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("https://rahmah-knits.onrender.com/api/products");
+        const res = await fetch(
+          "https://rahmah-knits.onrender.com/api/products"
+        );
         const data = await res.json();
         setProducts(data);
       } catch (error) {
@@ -24,11 +31,15 @@ export default function Products() {
     fetchProducts();
   }, []);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
   const handleFileChange = (e) => setFile(e.target.files[0]);
 
+  // ✅ ADD PRODUCT
   const handleAdd = async () => {
-    if (!form.name || !form.price) return alert("Name & price are required");
+    if (!form.name || !form.price)
+      return alert("Name & price are required");
 
     const formData = new FormData();
     formData.append("name", form.name);
@@ -37,10 +48,13 @@ export default function Products() {
     if (file) formData.append("image", file);
 
     try {
-      const res = await fetch("https://rahmah-knits.onrender.com/api/products", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        "https://rahmah-knits.onrender.com/api/products",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to upload product");
       const newProduct = await res.json();
@@ -54,37 +68,54 @@ export default function Products() {
     }
   };
 
+  // ✅ EDIT
   const handleEdit = (id) => {
     const p = products.find((x) => x.id === id);
     setEditing(id);
     setForm({
       name: p.name,
       price: p.price,
-      image: p.image_url, 
+      image: p.image, // 🟢 use p.image (your DB already returns image, not image_url)
       description: p.description,
     });
   };
 
+  // ✅ UPDATE PRODUCT (MAIN FIX HERE)
   const handleUpdate = async () => {
     try {
       const formData = new FormData();
       formData.append("name", form.name);
       formData.append("price", form.price);
       formData.append("description", form.description);
-      if (file) formData.append("image", file);
 
-      const res = await fetch(`https://rahmah-knits.onrender.com/api/products/${editing}`, {
-        method: "PUT",
-        body: formData,
-      });
+      if (file) {
+        // 🖼️ New image selected
+        formData.append("image", file);
+      } else if (form.image) {
+        // 🟢 Preserve old Cloudinary image URL
+        formData.append("image", form.image);
+      }
+
+      const res = await fetch(
+        `https://rahmah-knits.onrender.com/api/products/${editing}`,
+        {
+          method: "PUT",
+          body: formData,
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to update product");
       const updated = await res.json();
 
-      const next = products.map((p) => (p.id === editing ? updated : p));
+      // 🔁 Update local state
+      const next = products.map((p) =>
+        p.id === editing ? updated : p
+      );
       setProducts(next);
+
+      // 🧹 Reset form
       setEditing(null);
-      setForm({ name: "", price: "", img: "", description: "" });
+      setForm({ name: "", price: "", image: "", description: "" });
       setFile(null);
     } catch (error) {
       console.error(error);
@@ -92,11 +123,15 @@ export default function Products() {
     }
   };
 
+  // ✅ DELETE PRODUCT
   const handleDelete = async (id) => {
     if (!confirm("Delete this product?")) return;
 
     try {
-      const res = await fetch(`https://rahmah-knits.onrender.com/api/products/${id}`, { method: "DELETE" });
+      const res = await fetch(
+        `https://rahmah-knits.onrender.com/api/products/${id}`,
+        { method: "DELETE" }
+      );
       if (!res.ok) throw new Error("Delete failed");
 
       const next = products.filter((p) => p.id !== id);
@@ -113,22 +148,28 @@ export default function Products() {
       <div className="flex-1">
         <Header title="Products" subtitle="Manage your product catalog" />
         <main className="p-6 md:p-10">
-          {/*  Make Add/Edit form show on top for mobile */}
           <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-6">
-            {/* Products List */}
+            {/* Product List */}
             <div className="md:col-span-2">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {products.length > 0 ? (
                   products.map((p) => (
-                    <ProductCard key={p.id} p={p} onEdit={handleEdit} onDelete={handleDelete} />
+                    <ProductCard
+                      key={p.id}
+                      p={p}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                    />
                   ))
                 ) : (
-                  <div className="text-yellow-100/60">No products yet</div>
+                  <div className="text-yellow-100/60">
+                    No products yet
+                  </div>
                 )}
               </div>
             </div>
 
-            {/* Add/Edit Form */}
+            {/* Add / Edit Form */}
             <aside className="p-6 rounded-2xl bg-zinc-900 border border-yellow-400/10 order-first md:order-last">
               <h3 className="font-semibold mb-4">Add / Edit Product</h3>
 
@@ -147,12 +188,23 @@ export default function Products() {
                   placeholder="Price (₦)"
                   className="p-3 rounded bg-zinc-800 border border-zinc-700"
                 />
+
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleFileChange}
                   className="p-3 rounded bg-zinc-800 border border-zinc-700"
                 />
+
+                {/* ✅ Show current image preview when editing */}
+                {form.image && !file && (
+                  <img
+                    src={form.image}
+                    alt="Current product"
+                    className="w-24 h-24 object-cover rounded mt-2 border border-zinc-700"
+                  />
+                )}
+
                 <textarea
                   name="description"
                   value={form.description}
@@ -181,7 +233,13 @@ export default function Products() {
                       <button
                         onClick={() => {
                           setEditing(null);
-                          setForm({ name: "", price: "", img: "", description: "" });
+                          setForm({
+                            name: "",
+                            price: "",
+                            image: "",
+                            description: "",
+                          });
+                          setFile(null);
                         }}
                         className="px-4 py-2 border border-yellow-400/10 rounded"
                       >

@@ -97,40 +97,44 @@ class ProductController {
     }
   }
 
-  // UPDATE a product (including re-uploading image)
-  static async update(req, res) {
-    try {
-      const { id } = req.params;
-      const { name, price, description } = req.body;
-      let image = req.body.image; // Default to existing image (if no new file)
+  // 🟡 UPDATE a product (replaces image only if a new one is uploaded)
+static async update(req, res) {
+  try {
+    const { id } = req.params;
+    const { name, price, description } = req.body;
 
-      //  If a new image was uploaded, replace the old one on Cloudinary
-      if (req.file) {
-        const b64 = Buffer.from(req.file.buffer).toString("base64");
-        const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+    // 🧩 Start with existing image from the request body
+    // (Frontend should send the old image URL if not uploading a new one)
+    let image = req.body.image || null;
 
-        // Upload to Cloudinary
-        const uploadResult = await cloudinary.uploader.upload(dataURI, {
-          folder: "rahmahknits",
-        });
+    // 🖼️ If a new image file is uploaded, replace the old one on Cloudinary
+    if (req.file) {
+      const b64 = Buffer.from(req.file.buffer).toString("base64");
+      const dataURI = `data:${req.file.mimetype};base64,${b64}`;
 
-        image = uploadResult.secure_url; // Update image URL
-      }
-
-      // Update product in database
-      const updatedProduct = await ProductModel.update(id, {
-        name,
-        price,
-        description,
-        image,
+      // Upload to Cloudinary
+      const uploadResult = await cloudinary.uploader.upload(dataURI, {
+        folder: "rahmahknits",
       });
 
-      res.status(200).json(updatedProduct);
-    } catch (error) {
-      console.error("❌ Error updating product:", error);
-      res.status(500).json({ message: "Failed to update product" });
+      // Replace image URL with the new one
+      image = uploadResult.secure_url;
     }
+
+    // 💾 Update the product in the database
+    const updatedProduct = await ProductModel.update(id, {
+      name,
+      price: parseFloat(price),
+      description,
+      image, // Keep old image unless a new one was uploaded
+    });
+
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    console.error("❌ Error updating product:", error);
+    res.status(500).json({ message: "Failed to update product", error: error.message });
   }
+}
 
   //  DELETE a product by ID
   static async delete(req, res) {
