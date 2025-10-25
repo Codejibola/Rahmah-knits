@@ -1,30 +1,32 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react"; // import icons
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
   const [pw, setPw] = useState("");
   const [err, setErr] = useState("");
-  const [showPw, setShowPw] = useState(false); //  toggle state
+  const [showPw, setShowPw] = useState(false);
 
-  const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD ;
+  const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (pw === ADMIN_PASSWORD.trim()) {
+
+    if (pw.trim() === ADMIN_PASSWORD.trim()) {
       sessionStorage.setItem("rahmah_admin_auth", "true");
-      navigate("/admin");
+      setTimeout(() => navigate("/admin"), 100); // small delay for mobile
     } else {
       setErr("Incorrect password");
     }
-
   };
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-6">
       <div className="w-full max-w-md bg-zinc-900/60 border border-yellow-400/10 rounded-2xl p-8 text-center shadow-lg">
-        <h2 className="text-3xl font-semibold text-yellow-200 mb-2">Admin Login</h2>
+        <h2 className="text-3xl font-semibold text-yellow-200 mb-2">
+          Admin Login
+        </h2>
         <p className="text-sm text-yellow-100/60 mb-6">
           Enter the admin password to manage Rahmah Knits
         </p>
@@ -37,7 +39,7 @@ export default function Login() {
               value={pw}
               onChange={(e) => setPw(e.target.value)}
               placeholder="Password"
-              className="w-full p-3 rounded-lg bg-zinc-900 border border-zinc-700 text-yellow-100 pr-10"
+              className="w-full p-3 pr-12 rounded-lg bg-zinc-900 border border-zinc-700 text-yellow-100"
             />
             <button
               type="button"
@@ -48,7 +50,10 @@ export default function Login() {
             </button>
           </div>
 
-          <button className="py-3 rounded-lg bg-yellow-400 text-black font-semibold hover:bg-yellow-500 transition">
+          <button
+            type="submit"
+            className="py-3 rounded-lg bg-yellow-400 text-black font-semibold hover:bg-yellow-500 transition"
+          >
             Sign in
           </button>
 
