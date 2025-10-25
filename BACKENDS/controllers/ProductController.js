@@ -1,6 +1,6 @@
 //  Import dependencies and configurations
 import ProductModel from "../models/ProductModel.js";   // Database model for product operations (CRUD)
-import cloudinary from "../config/cloudinary.js";       // Cloudinary configuration file for image uploads
+import cloudinary from "../config/cloundinary.js";       // Cloudinary configuration file for image uploads
 import streamifier from "streamifier";                  // Converts file buffers into readable streams (for Cloudinary upload)
 
 //  Controller class to handle all product-related operations

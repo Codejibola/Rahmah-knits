@@ -6,18 +6,19 @@ export default function Login() {
   const navigate = useNavigate();
   const [pw, setPw] = useState("");
   const [err, setErr] = useState("");
-  const [showPw, setShowPw] = useState(false); // 👁️ toggle state
+  const [showPw, setShowPw] = useState(false); //  toggle state
 
-  const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || "rahmahAdmin2025";
+  const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD ;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (pw === ADMIN_PASSWORD) {
+    if (pw === ADMIN_PASSWORD.trim()) {
       sessionStorage.setItem("rahmah_admin_auth", "true");
       navigate("/admin");
     } else {
       setErr("Incorrect password");
     }
+
   };
 
   return (
