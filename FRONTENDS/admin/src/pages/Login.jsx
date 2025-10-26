@@ -13,7 +13,7 @@ export default function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (pw.trim() === ADMIN_PASSWORD) {
+    if (pw === ADMIN_PASSWORD) {
       sessionStorage.setItem("rahmah_admin_auth", "true");
       setTimeout(() => navigate("/admin"), 100); // small delay for mobile
     } else {
