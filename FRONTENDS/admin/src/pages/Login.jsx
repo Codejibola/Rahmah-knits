@@ -11,15 +11,21 @@ export default function Login() {
   const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (pw === ADMIN_PASSWORD) {
-      sessionStorage.setItem("rahmah_admin_auth", "true");
-      setTimeout(() => navigate("/admin"), 100); // small delay for mobile
-    } else {
-      setErr("Incorrect password");
-    }
-  };
+  console.log({
+    entered: pw,
+    env: ADMIN_PASSWORD,
+    match: pw.trim() === ADMIN_PASSWORD.trim(),
+  });
+
+  if (String(pw).trim() === String(ADMIN_PASSWORD).trim()) {
+    sessionStorage.setItem("rahmah_admin_auth", "true");
+    navigate("/admin");
+  } else {
+    setErr("Incorrect password");
+  }
+};
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-6">
