@@ -20,7 +20,7 @@ export default function Dashboard() {
       }
 
       try {
-        // ✅ Fetch messages from backend API instead of localStorage
+        // Fetch messages from backend API instead of localStorage
         const resMsg = await fetch("https://rahmah-knits.onrender.com/api/messages");
         if (!resMsg.ok) throw new Error("Failed to fetch messages");
         const dataMsg = await resMsg.json();

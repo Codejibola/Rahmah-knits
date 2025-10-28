@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import ProductCard from "../components/ProductCard";
-// eslint-disable-next-line no-unused-vars
+//eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
 export default function Products() {
@@ -16,12 +16,14 @@ export default function Products() {
   });
   const [file, setFile] = useState(null);
 
+  // ✅ Refs for scrolling (mobile UX improvement)
+  const formRef = useRef(null);
+  const topRef = useRef(null);
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch(
-          "https://rahmah-knits.onrender.com/api/products"
-        );
+        const res = await fetch("https://rahmah-knits.onrender.com/api/products");
         const data = await res.json();
         setProducts(data);
       } catch (error) {
@@ -48,13 +50,10 @@ export default function Products() {
     if (file) formData.append("image", file);
 
     try {
-      const res = await fetch(
-        "https://rahmah-knits.onrender.com/api/products",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const res = await fetch("https://rahmah-knits.onrender.com/api/products", {
+        method: "POST",
+        body: formData,
+      });
 
       if (!res.ok) throw new Error("Failed to upload product");
       const newProduct = await res.json();
@@ -68,19 +67,26 @@ export default function Products() {
     }
   };
 
-  // ✅ EDIT
+  // ✅ EDIT PRODUCT — auto scrolls to the form on mobile
   const handleEdit = (id) => {
     const p = products.find((x) => x.id === id);
     setEditing(id);
     setForm({
       name: p.name,
       price: p.price,
-      image: p.image, // 🟢 use p.image (your DB already returns image, not image_url)
+      image: p.image,
       description: p.description,
     });
+
+    // 🟢 Auto scroll down to the form when editing (mobile only)
+    setTimeout(() => {
+      if (window.innerWidth < 768 && formRef.current) {
+        formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
   };
 
-  // ✅ UPDATE PRODUCT (MAIN FIX HERE)
+  // ✅ UPDATE PRODUCT — scrolls back up after saving
   const handleUpdate = async () => {
     try {
       const formData = new FormData();
@@ -89,10 +95,8 @@ export default function Products() {
       formData.append("description", form.description);
 
       if (file) {
-        // 🖼️ New image selected
         formData.append("image", file);
       } else if (form.image) {
-        // 🟢 Preserve old Cloudinary image URL
         formData.append("image", form.image);
       }
 
@@ -107,7 +111,6 @@ export default function Products() {
       if (!res.ok) throw new Error("Failed to update product");
       const updated = await res.json();
 
-      // 🔁 Update local state
       const next = products.map((p) =>
         p.id === editing ? updated : p
       );
@@ -117,6 +120,13 @@ export default function Products() {
       setEditing(null);
       setForm({ name: "", price: "", image: "", description: "" });
       setFile(null);
+
+      // 🟢 Scroll back to top after saving (mobile only)
+      setTimeout(() => {
+        if (window.innerWidth < 768 && topRef.current) {
+          topRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 200);
     } catch (error) {
       console.error(error);
       alert("Failed to update product");
@@ -146,10 +156,13 @@ export default function Products() {
     <div className="flex min-h-screen bg-black text-yellow-200">
       <Sidebar />
       <div className="flex-1">
+        {/* Scroll target for going back up after save */}
+        <div ref={topRef}></div>
+
         <Header title="Products" subtitle="Manage your product catalog" />
         <main className="p-6 md:p-10">
           <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-6">
-            {/* Product List */}
+            {/* PRODUCT LIST */}
             <div className="md:col-span-2">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {products.length > 0 ? (
@@ -162,15 +175,16 @@ export default function Products() {
                     />
                   ))
                 ) : (
-                  <div className="text-yellow-100/60">
-                    No products yet
-                  </div>
+                  <div className="text-yellow-100/60">No products yet</div>
                 )}
               </div>
             </div>
 
-            {/* Add / Edit Form */}
-            <aside className="p-6 rounded-2xl bg-zinc-900 border border-yellow-400/10 order-first md:order-last">
+            {/* ADD / EDIT FORM */}
+            <aside
+              ref={formRef}
+              className="p-6 rounded-2xl bg-zinc-900 border border-yellow-400/10 order-first md:order-last"
+            >
               <h3 className="font-semibold mb-4">Add / Edit Product</h3>
 
               <div className="flex flex-col gap-3">
@@ -196,7 +210,7 @@ export default function Products() {
                   className="p-3 rounded bg-zinc-800 border border-zinc-700"
                 />
 
-                {/* ✅ Show current image preview when editing */}
+                {/* Show current image preview when editing */}
                 {form.image && !file && (
                   <img
                     src={form.image}
