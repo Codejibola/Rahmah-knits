@@ -74,7 +74,7 @@ export default function Home() {
           transition={{ duration: 1 }}
           className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200 animate-pulse"
         >
-          Rahmah Knits
+          RAHMAH KNITS
         </motion.h1>
 
         <motion.p

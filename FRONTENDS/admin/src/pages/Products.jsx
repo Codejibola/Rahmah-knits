@@ -16,7 +16,7 @@ export default function Products() {
   });
   const [file, setFile] = useState(null);
 
-  // ✅ Refs for scrolling (mobile UX improvement)
+  //  Refs for scrolling (mobile UX improvement)
   const formRef = useRef(null);
   const topRef = useRef(null);
 
@@ -38,7 +38,7 @@ export default function Products() {
 
   const handleFileChange = (e) => setFile(e.target.files[0]);
 
-  // ✅ ADD PRODUCT
+  //  ADD PRODUCT
   const handleAdd = async () => {
     if (!form.name || !form.price)
       return alert("Name & price are required");
@@ -67,7 +67,7 @@ export default function Products() {
     }
   };
 
-  // ✅ EDIT PRODUCT — auto scrolls to the form on mobile
+  //  EDIT PRODUCT — auto scrolls to the form on mobile
   const handleEdit = (id) => {
     const p = products.find((x) => x.id === id);
     setEditing(id);
@@ -78,7 +78,7 @@ export default function Products() {
       description: p.description,
     });
 
-    // 🟢 Auto scroll down to the form when editing (mobile only)
+    //  Auto scroll down to the form when editing (mobile only)
     setTimeout(() => {
       if (window.innerWidth < 768 && formRef.current) {
         formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -86,7 +86,7 @@ export default function Products() {
     }, 100);
   };
 
-  // ✅ UPDATE PRODUCT — scrolls back up after saving
+  //  UPDATE PRODUCT — scrolls back up after saving
   const handleUpdate = async () => {
     try {
       const formData = new FormData();
@@ -116,12 +116,12 @@ export default function Products() {
       );
       setProducts(next);
 
-      // 🧹 Reset form
+      //  Reset form
       setEditing(null);
       setForm({ name: "", price: "", image: "", description: "" });
       setFile(null);
 
-      // 🟢 Scroll back to top after saving (mobile only)
+      //  Scroll back to top after saving (mobile only)
       setTimeout(() => {
         if (window.innerWidth < 768 && topRef.current) {
           topRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -133,7 +133,7 @@ export default function Products() {
     }
   };
 
-  // ✅ DELETE PRODUCT
+  //  DELETE PRODUCT
   const handleDelete = async (id) => {
     if (!confirm("Delete this product?")) return;
 

@@ -25,7 +25,7 @@ export default function Sidebar() {
       <aside className="hidden md:block w-64 bg-black border-r border-yellow-400/10 min-h-screen text-yellow-200">
         <div className="p-6">
           <div className="text-2xl font-semibold mb-6">
-            Rahmah<span className="text-yellow-300">Knits</span>
+            RAHMAH<span className="text-yellow-300">KNITS</span>
           </div>
 
           <nav className="flex flex-col gap-2">

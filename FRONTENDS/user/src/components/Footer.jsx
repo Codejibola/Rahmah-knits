@@ -10,7 +10,7 @@ export default function Footer() {
         transition={{ duration: 1 }}
       >
         <h2 className="text-2xl font-semibold mb-2">
-          Rahmah<span className="text-yellow-400">Knits</span>
+          RAHMAH<span className="text-yellow-400">KNITS</span>
         </h2>
         <p className="text-yellow-100/80 text-sm mb-6">
           Crafted with love, warmth, and elegance — because every stitch tells a story.
