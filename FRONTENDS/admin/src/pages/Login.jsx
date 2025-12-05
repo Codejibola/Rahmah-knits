@@ -14,8 +14,8 @@ export default function Login() {
   // State to toggle password visibility
   const [showPw, setShowPw] = useState(false);
 
-  // Access admin password stored in your environment variable (.env)
-  // Make sure your file is named `.env` or `.env.local` and variable starts with VITE_
+  // Access admin password stored in environment variable (.env)
+  // Make sure file is named `.env` or `.env.local` and variable starts with VITE_
   const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
   // Function runs when login form is submitted
