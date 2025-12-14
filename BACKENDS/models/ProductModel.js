@@ -1,4 +1,4 @@
-import pool from "../config/db.js";
+import {dbQuery} from "../config/db.js";
 
 class ProductModel {
   static async getAll() {
@@ -7,7 +7,7 @@ class ProductModel {
   }
 
   static async getById(id) {
-    const result = await pool.query("SELECT * FROM products WHERE id = $1", [id]);
+    const result = await dbQuery("SELECT * FROM products WHERE id = $1", [id]);
     return result.rows[0];
   }
 
