@@ -1,4 +1,4 @@
-import { dbQuery } from "../dbQuery.js";
+import {dbQuery} from "../config/dbQuery.js";
 
 class ProductModel {
   static async getAll() {
