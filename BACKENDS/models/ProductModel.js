@@ -2,7 +2,7 @@ import {dbQuery} from "../config/dbQuery.js";
 
 class ProductModel {
   static async getAll() {
-    const result = await pool.query("SELECT * FROM products ORDER BY id DESC");
+    const result = await dbQuery("SELECT * FROM products ORDER BY id DESC");
     return result.rows;
   }
 
