@@ -4,21 +4,24 @@ const { Pool } = pkg;
 const pool = new Pool({
   connectionString:
     process.env.DATABASE_URL ||
-    "postgres://rahmahknits_user:pVQ6EvLNKjbMvM4F9wcq8Cbbhx25ZS5M@dpg-d3r4l8fdiees73aq5kng-a.oregon-postgres.render.com/rahmahknits",
+    "postgres://rahmahknits_user:***@dpg-d3r4l8fdiees73aq5kng-a.oregon-postgres.render.com/rahmahknits",
   ssl: {
-    rejectUnauthorized: false, // ✅ Required for Render
+    rejectUnauthorized: false,
   },
+
+  // 🔧 Stability-focused optimizations
+  max: 5,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
 });
 
-// ✅ Only log once when pool is created — don’t call pool.connect()
 pool
-  .query("SELECT NOW()")
-  .then(() => console.log("✅ PostgreSQL pool ready"))
-  .catch((err) => console.error("❌ PostgreSQL connection error:", err.message));
+  .query("SELECT 1")
+  .then(() => console.log("PostgreSQL pool ready"))
+  .catch((err) => console.error("PostgreSQL startup check failed:", err.message));
 
-// Optional: handle idle connection errors gracefully
 pool.on("error", (err) => {
-  console.error("⚠️ Unexpected PostgreSQL error", err.message);
+  console.error("Unexpected PostgreSQL pool error:", err.message);
 });
 
 export default pool;
