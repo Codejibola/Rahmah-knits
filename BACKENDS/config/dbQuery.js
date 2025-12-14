@@ -4,7 +4,7 @@ export async function dbQuery(text, params = []) {
   try {
     return await pool.query(text, params);
   } catch (err) {
-    if (err.message === "Connection terminated unexpectedly") {
+    if (err.message && err.message.includes("terminated")) {
       console.warn("DB connection dropped. Retrying once...");
       return await pool.query(text, params);
     }
