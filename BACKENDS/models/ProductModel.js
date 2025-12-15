@@ -12,7 +12,7 @@ class ProductModel {
   }
 
   static async create({ name, price, description, image }) {
-    const result = await pool.query(
+    const result = await dbQuery(
       "INSERT INTO products (name, price, description, image) VALUES ($1, $2, $3, $4) RETURNING *",
       [name, price, description, image]
     );
@@ -20,7 +20,7 @@ class ProductModel {
   }
 
   static async update(id, { name, price, description, image }) {
-    const result = await pool.query(
+    const result = await dbQuery(
       "UPDATE products SET name = $1, price = $2, description = $3, image = $4 WHERE id = $5 RETURNING *",
       [name, price, description, image, id]
     );
@@ -28,7 +28,7 @@ class ProductModel {
   }
 
   static async delete(id) {
-    await pool.query("DELETE FROM products WHERE id = $1", [id]);
+    await dbQuery("DELETE FROM products WHERE id = $1", [id]);
     return true;
   }
 }
