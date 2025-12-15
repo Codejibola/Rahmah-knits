@@ -1,7 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import pool from "./config/db.js";
 import ProductRoutes from "./routes/ProductRoutes.js";
 import messageRoutes from "./routes/MessagesRoutes.js";
 

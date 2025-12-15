@@ -1,27 +1,38 @@
 import pkg from "pg";
 const { Pool } = pkg;
 
-const pool = new Pool({
-  connectionString:
-    process.env.DATABASE_URL ||
-    "postgres://rahmahknits_user:***@dpg-d3r4l8fdiees73aq5kng-a.oregon-postgres.render.com/rahmahknits",
-  ssl: {
-    rejectUnauthorized: false,
-  },
+let pool;
 
-  // 🔧 Stability-focused optimizations
-  max: 5,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
-});
+function createPool() {
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false, // Required for Render
+    },
+    max: 5,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+  });
 
-pool
-  .query("SELECT 1")
-  .then(() => console.log("PostgreSQL pool ready"))
-  .catch((err) => console.error("PostgreSQL startup check failed:", err.message));
+  pool.on("error", (err) => {
+    console.error("⚠️ PostgreSQL pool error:", err.message);
+  });
 
-pool.on("error", (err) => {
-  console.error("Unexpected PostgreSQL pool error:", err.message);
-});
+  console.log("✅ PostgreSQL pool created");
+  return pool;
+}
 
-export default pool;
+// Create initial pool
+createPool();
+
+export function getPool() {
+  return pool;
+}
+
+export function resetPool() {
+  console.warn("♻️ Resetting PostgreSQL pool...");
+  if (pool) {
+    pool.end().catch(() => {});
+  }
+  createPool();
+}
