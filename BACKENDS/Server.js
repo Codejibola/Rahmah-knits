@@ -33,7 +33,7 @@ class App {
     this.app.use("/api/messages", messageRoutes);
 
     this.app.get("/", (req, res) => {
-      res.send("Welcome to RahmahKnits API 🧶");
+      res.send("Welcome to RahmahKnits API ");
     });
   }
 
