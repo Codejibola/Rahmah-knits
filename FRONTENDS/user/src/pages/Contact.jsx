@@ -93,7 +93,7 @@ const Contact = () => {
   return (
     <section
       id="contact"
-      className="min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black text-white py-20 px-6 flex flex-col justify-center items-center relative overflow-hidden"
+      className="min-h-screen bg-gradient-to-b from-[#14110E] via-zinc-900 to-black text-white py-20 px-6 flex flex-col justify-center items-center relative overflow-hidden"
     >
       <motion.h2
         initial={{ opacity: 0, y: 30 }}

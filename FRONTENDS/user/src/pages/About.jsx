@@ -5,7 +5,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="min-h-screen bg-black text-yellow-100 flex flex-col justify-center items-center px-6 md:px-24 text-center"
+      className="min-h-screen bg-[#14110E] text-yellow-100 flex flex-col justify-center items-center px-6 md:px-24 text-center"
     >
       <motion.h2
         initial={{ opacity: 0, y: 40 }}
